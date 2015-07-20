@@ -1,0 +1,63 @@
+<project name="School Translator" default="all">
+
+	<property name="src" value="./src" />
+    <property name="test" value="./test" />
+    <property name="build" value="./build" />
+    <property name="javacencoding" value="cp1251"/>
+	<property name="javacchome" value="./javacc" />
+	<property name="javacctarget" value="grammar.jj" />
+	<property name="javaccpackagename" value="slparser" />
+	<property name="javaccpackagepath" value="${src}/${javaccpackagename}" />
+    <property name="junitclasspath" value="junit/junit.jar" />
+
+	<target name="all" description="Do the entire build" depends="src.compile">
+		<echo>I build my software</echo>
+	</target>
+    
+    <target name="src.clean" description="Clear output folder for compile">
+        <delete dir="${build}"/>
+        <mkdir dir="${build}"/>
+	</target>
+
+	<target name="javacc.compile" description="Compile file ${javacctarget}">
+		<javacc
+			target="${src}/${javacctarget}"
+			outputdirectory="${javaccpackagepath}"
+			javacchome="${javacchome}"
+		/>
+	</target>
+
+    <target name="src.compile" description="Compile project">
+        <javac srcdir="${src}"
+	        encoding="${javacencoding}"
+	        includes="**/*.java"
+	        destdir="${build}"
+	    />
+    </target>
+    
+    <target name="test.compile" description="Compile tests" depends="src.compile">
+        <javac srcdir="${test}"
+	        encoding="${javacencoding}"
+	        classpath="${junitclasspath}"
+	        includes="**/*.java"
+	        destdir="${build}"
+	    />
+    </target>
+
+	<target name="test.run" description="Run all tests of project" depends="test.compile">
+		<junit printsummary="withOutAndErr">
+			<formatter type="brief" usefile="false" />
+			<classpath>
+				<pathelement location="${junitclasspath}"/>
+			    <pathelement path="${build}"/>
+			</classpath>
+
+			<batchtest>
+				<fileset dir="${build}">
+					<include name="**/*Test.class"/>
+				</fileset>
+			</batchtest>
+		</junit>
+	</target>
+
+</project>
